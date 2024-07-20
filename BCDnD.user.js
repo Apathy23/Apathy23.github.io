@@ -16,7 +16,7 @@
 
 
 import(
-	`https://apathy23.gitlab.io/bc-addon-loader/index.js?v=${(
+	`https://apathy23.gitlab.io/index.js?v=${(
 		Date.now() / 10000
 	).toFixed(0)}`
 )
