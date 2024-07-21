@@ -1,7 +1,7 @@
 const BCDnDVersion = "0.0.1";
 
 async function runBCDnD() {
-    await waitFor(() => ServerSocket && ServerIsConnected);
+    //await waitFor(() => ServerSocket && ServerIsConnected);
 
 
     let ChatRoomCharacterArray = [];
