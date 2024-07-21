@@ -4,7 +4,6 @@
 // @version 1
 // @description 
 // @author Natalie
-// @downloadURL  https://github.com/apathy23/BCDnD/raw/main/bcdndLoader.user.js
 // @match https://bondageprojects.elementfx.com/*
 // @match https://www.bondageprojects.elementfx.com/*
 // @match https://bondage-europe.com/*
