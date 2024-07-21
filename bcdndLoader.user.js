@@ -14,7 +14,8 @@
 // ==/UserScript==
 
 (function() {
+    'use strict';
     var script = document.createElement("script");
-    script.src = "https://apathy23.gitlab.io/bcdnd.js";
+    script.src = "https://apathy23.github.io/bcdnd.js";
     document.head.appendChild(script);
 })();
