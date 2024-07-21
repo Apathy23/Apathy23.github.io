@@ -1,39 +1,41 @@
 const BCDnDVersion = "0.0.1";
 
-let ChatRoomCharacterArray = [];
-
-class Trap {
-    constructor(name, assetName, assetGroup, message, isActive, positionX, positionY) {
-        this.name = name;
-        this.assetName = assetName;
-        this.assetGroup = assetGroup;
-        this.message = message;
-        this.isActive = isActive;
-        this.positionX = positionX;
-        this.positionY = positionY;
-    }
-
-    changeRestraint(newRestraint) {
-        this.restraint = newRestraint;
-    }
-
-    activate() {
-        this.isActive = true;
-    }
-
-    deactivate() {
-        this.isActive = false;
-    }
-
-    move(newPositionX, newPositionY) {
-        this.positionX = newPositionX;
-        this.positionY = newPositionY;
-    }
-}
-
-
 async function runBCDnD() {
     await waitFor(() => ServerSocket && ServerIsConnected);
+
+
+    let ChatRoomCharacterArray = [];
+
+    class Trap {
+        constructor(name, assetName, assetGroup, message, isActive, positionX, positionY) {
+            this.name = name;
+            this.assetName = assetName;
+            this.assetGroup = assetGroup;
+            this.message = message;
+            this.isActive = isActive;
+            this.positionX = positionX;
+            this.positionY = positionY;
+        }
+
+        changeRestraint(newRestraint) {
+            this.restraint = newRestraint;
+        }
+
+        activate() {
+            this.isActive = true;
+        }
+
+        deactivate() {
+            this.isActive = false;
+        }
+
+        move(newPositionX, newPositionY) {
+            this.positionX = newPositionX;
+            this.positionY = newPositionY;
+        }
+    }
+
+
 
     // Bondage Club Mod Development Kit (1.2.0)
 	// For more info see: https://github.com/Jomshir98/bondage-club-mod-sdk
@@ -56,6 +58,8 @@ async function runBCDnD() {
             InventoryWear(char, shackleTrap.assetName, shackleTrap.assetGroup, null, 5, 66317, null, true);
             ChatRoomCharacterUpdate(char);
         }
-});
+    });
 }
+
+runBCDnD();
 
