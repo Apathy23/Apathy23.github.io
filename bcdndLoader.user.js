@@ -9,7 +9,7 @@
 // @match https://bondage-europe.com/*
 // @match https://www.bondage-europe.com/*
 // @match http://localhost:*/*
-// @grant none
+// @grant GM_xmlhttpRequest
 // @run-at document-end
 // ==/UserScript==
 
