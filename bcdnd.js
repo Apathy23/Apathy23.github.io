@@ -51,14 +51,16 @@ async function runBCDnD() {
 
     let shackleTrap = new Trap("Shackle Trap", "AnkleShackles", "ItemFeet", "You are shackled.", true, 20, 20);
 
-    ChatRoomCharacter.foreach(char => {
-        if (!char.Mapdata) return;
-        if (char.Mapdata.Pos.X == shackleTrap.positionX && char.Mapdata.Pos.Y == shackleTrap.positionY && shackleTrap.isActive) {
-            shackleTrap.deactivate();
-            InventoryWear(char, shackleTrap.assetName, shackleTrap.assetGroup, null, 5, 66317, null, true);
-            ChatRoomCharacterUpdate(char);
-        }
-    });
+    while (true) {
+        ChatRoomCharacter.foreach(char => {
+            if (!char.Mapdata) return;
+            if (char.Mapdata.Pos.X == shackleTrap.positionX && char.Mapdata.Pos.Y == shackleTrap.positionY && shackleTrap.isActive) {
+                shackleTrap.deactivate();
+                InventoryWear(char, shackleTrap.assetName, shackleTrap.assetGroup, null, 5, 66317, null, true);
+                ChatRoomCharacterUpdate(char);
+            }
+        });
+    }
 }
 
 runBCDnD();
