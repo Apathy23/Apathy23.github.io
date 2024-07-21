@@ -51,7 +51,7 @@ async function runBCDnD() {
 
     let shackleTrap = new Trap("Shackle Trap", "AnkleShackles", "ItemFeet", "You are shackled.", true, 20, 20);
 
-    while (true) {
+
         ChatRoomCharacter.forEach(char => {
             if (!char.Mapdata) return;
             if (char.Mapdata.Pos.X == shackleTrap.positionX && char.Mapdata.Pos.Y == shackleTrap.positionY && shackleTrap.isActive) {
@@ -60,7 +60,6 @@ async function runBCDnD() {
                 ChatRoomCharacterUpdate(char);
             }
         });
-    }
 }
 
 runBCDnD();
