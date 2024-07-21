@@ -1,22 +1,21 @@
 // ==UserScript==
-// @name BCDND
+// @name BCDND Loader
 // @namespace https://www.bondageprojects.com/
-// @version 1.0
+// @version 1
 // @description 
-// @author 
+// @author Natalie
 // @match https://bondageprojects.elementfx.com/*
 // @match https://www.bondageprojects.elementfx.com/*
 // @match https://bondage-europe.com/*
 // @match https://www.bondage-europe.com/*
 // @match http://localhost:*/*
-// @icon 
 // @grant none
 // @run-at document-end
 // ==/UserScript==
 
-
-import(
-	`https://apathy23.gitlab.io/index.js?v=${(
-		Date.now() / 10000
-	).toFixed(0)}`
-)
+(function() {
+    'use strict';
+    var script = document.createElement("script");
+    script.src = "https://apathy23.gitlab.io/index.js";
+    document.head.appendChild(script);
+})();
