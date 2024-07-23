@@ -29,7 +29,8 @@ async function runBCDnD() {
             difficultyOffset: 0,
             difficultyOffset2: 5,
             id: 0,
-            position: { X: 11, Y: 10}
+            position: { X: 11, Y: 10},
+            active: true
         },
         {
             name: "Slime",
@@ -44,20 +45,29 @@ async function runBCDnD() {
             difficultyOffset: 0,
             difficultyOffset2: 5,
             id: 0,
-            position: { X: 10, Y: 10}
+            position: { X: 10, Y: 10},
+            active: true
         }
     ];
 
+    // Make a function to roll a d20 with the option of adding a modifier and check the dice roll against trapArray.difficulty
+    function rollD20(modifier) {
+        let roll = Math.floor(Math.random() * 20) + 1;
+        return roll + modifier;
+    }
+
+
     function checkTrap() {
-        console.log("Checking traps");
         if (Player.MapData) {
             for (let i = 0; i < trapArray.length; i++) {
                 for (let j = 0; j < ChatRoomCharacter.length; j++) {
-                    if (InventoryGet(ChatRoomCharacter[j], trapArray[i].slot) == null) {
+                    if (InventoryGet(ChatRoomCharacter[j], trapArray[i].slot) == null && trapArray[i].active) {
                         if (ChatRoomCharacter[j].MapData.Pos.X == trapArray[i].position.X && ChatRoomCharacter[j].MapData.Pos.Y == trapArray[i].position.Y) {
-                            console.log("Found character at trap position");
+                            trapArray[i].active = false;
                             InventoryWear(ChatRoomCharacter[j], trapArray[i].name, trapArray[i].slot, trapArray[i].color, 5, ChatRoomCharacter[j].ID, null, true);
+                            ServerSend("ChatRoomChat", { Content: trapArray[i].dialog, Type: "Emote", Target: ChatRoomCharacter[j].MemberNumber });
                             ChatRoomCharacterUpdate(ChatRoomCharacter[j]);
+                            setTimeout(trapArray[i].active = true, 5000);
                         }
                     }
                 }
