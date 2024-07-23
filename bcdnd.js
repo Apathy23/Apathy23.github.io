@@ -33,7 +33,6 @@ async function runBCDnD() {
     ];
 
     function checkTrap() {
-        if (ChatRoomCharacter.Mapdata) {
             for (let i = 0; i < ChatRoomCharacter.length; i++) {
                 if (InventoryGet(ChatRoomCharacter[i], "ItemFeet") != null) return;
                 if (ChatRoomCharacter[i].MapData && ChatRoomCharacter[i].MapData.Pos.X == 10 && ChatRoomCharacter[i].MapData.Pos.Y == 10) {
@@ -42,7 +41,6 @@ async function runBCDnD() {
                     ChatRoomCharacterUpdate(ChatRoomCharacter[i]);
                 }
             }
-        }
     }
 
     modAPI.hookFunction('TimerProcess', 2, (args, next) => { 
