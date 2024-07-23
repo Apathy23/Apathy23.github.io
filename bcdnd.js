@@ -46,7 +46,7 @@ async function runBCDnD() {
     }
 
     modAPI.hookFunction('TimerProcess', 2, (args, next) => { 
-		checkTrap
+		checkTrap();
 		next(args);
 	})
 }
