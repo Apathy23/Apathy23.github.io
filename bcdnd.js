@@ -32,15 +32,20 @@ async function runBCDnD() {
         },
     ];
 
-    if (ChatRoomCharacter.Mapdata) {
-        for (let i = 0; i < ChatRoomCharacter.length; i++) {
-            if (ChatRoomCharacter[i].MapData && ChatRoomCharacter[i].MapData.Pos.X == 10 && ChatRoomCharacter[i].MapData.Pos.Y == 10) {
-                console.log("Found character at 10, 10");
-                InventoryWear(ChatRoomCharacter[i], trapArray[0].name, trapArray[0].slot, trapArray[0].color, 5, ChatRoomCharacter[i].ID, null, true);
-                ChatRoomCharacterUpdate(ChatRoomCharacter[i]);
+    function checkTrap() {
+        if (ChatRoomCharacter.Mapdata) {
+            for (let i = 0; i < ChatRoomCharacter.length; i++) {
+                if (InventoryGet(ChatRoomCharacter[i], "ItemFeet") != null) return;
+                if (ChatRoomCharacter[i].MapData && ChatRoomCharacter[i].MapData.Pos.X == 10 && ChatRoomCharacter[i].MapData.Pos.Y == 10) {
+                    console.log("Found character at 10, 10");
+                    InventoryWear(ChatRoomCharacter[i], trapArray[0].name, trapArray[0].slot, trapArray[0].color, 5, ChatRoomCharacter[i].ID, null, true);
+                    ChatRoomCharacterUpdate(ChatRoomCharacter[i]);
+                }
             }
         }
     }
+
+    setInterval(checkTrap, 100);
 }
 
 runBCDnD();
