@@ -63,7 +63,7 @@ async function runBCDnD() {
                 }
             }
         }
-
+    }
             /*
             for (let i = 0; i < ChatRoomCharacter.length; i++) {
                 if (InventoryGet(ChatRoomCharacter[i], "ItemFeet") == null) {
@@ -75,9 +75,8 @@ async function runBCDnD() {
                 }
             }
                 */
-    }
 
-    modAPI.hookFunction('TimerProcess', 2, (args, next) => { 
+    modAPI.hookFunction('TimerProcess', 1, (args, next) => { 
 		checkTrap();
 		next(args);
 	})
