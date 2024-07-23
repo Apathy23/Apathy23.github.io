@@ -17,7 +17,7 @@ async function runBCDnD() {
 
     trapArray = [
         {
-            name: "Ankle Shackles",
+            name: "AnkleShackles",
             slot: "ItemFeet",
             color: null,
             craftName: null,
