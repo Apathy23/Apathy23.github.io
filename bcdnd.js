@@ -28,12 +28,43 @@ async function runBCDnD() {
             difficultyMultiplier: 1,
             difficultyOffset: 0,
             difficultyOffset2: 5,
-            id: 0
+            id: 0,
+            position: { X: 11, Y: 10}
         },
+        {
+            name: "Slime",
+            slot: "ItemFeet",
+            color: null,
+            craftName: null,
+            craftDescription: "",
+            itemTypeRecord: {},
+            dialog: "A wet and sticky substance covers your feet as you step on the trap. You feel your feet being pulled down into the ground.",
+            lock: "",
+            difficultyMultiplier: 1,
+            difficultyOffset: 0,
+            difficultyOffset2: 5,
+            id: 0,
+            position: { X: 10, Y: 10}
+        }
     ];
 
     function checkTrap() {
-        // if (Player.MapData) to check for if player is in map room
+        console.log("Checking traps");
+        if (Player.MapData) {
+            for (let i = 0; i < trapArray.length; i++) {
+                for (let j = 0; j < ChatRoomCharacter.length; j++) {
+                    if (InventoryGet(ChatRoomCharacter[j], trapArray[i].slot) == null) {
+                        if (ChatRoomCharacter[j].MapData.Pos.X == trapArray[i].position.X && ChatRoomCharacter[j].MapData.Pos.Y == trapArray[i].position.Y) {
+                            console.log("Found character at trap position");
+                            InventoryWear(ChatRoomCharacter[j], trapArray[i].name, trapArray[i].slot, trapArray[i].color, 5, ChatRoomCharacter[j].ID, null, true);
+                            ChatRoomCharacterUpdate(ChatRoomCharacter[j]);
+                        }
+                    }
+                }
+            }
+        }
+
+            /*
             for (let i = 0; i < ChatRoomCharacter.length; i++) {
                 if (InventoryGet(ChatRoomCharacter[i], "ItemFeet") == null) {
                     if (ChatRoomCharacter[i].MapData && ChatRoomCharacter[i].MapData.Pos.X == 10 && ChatRoomCharacter[i].MapData.Pos.Y == 10) {
@@ -43,6 +74,7 @@ async function runBCDnD() {
                     }
                 }
             }
+                */
     }
 
     modAPI.hookFunction('TimerProcess', 2, (args, next) => { 
