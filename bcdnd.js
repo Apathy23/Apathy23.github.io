@@ -43,9 +43,11 @@ async function runBCDnD() {
                 }
             }
         }
+       setTimeout(checkTrap, 1000
+       ); 
     }
 
-    setInterval(checkTrap, 100);
+    checkTrap();
 }
 
 runBCDnD();
