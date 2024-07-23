@@ -43,11 +43,12 @@ async function runBCDnD() {
                 }
             }
         }
-       setTimeout(checkTrap, 1000
-       ); 
     }
 
-    checkTrap();
+    modAPI.hookFunction('TimerProcess', 2, (args, next) => { 
+		checkTrap
+		next(args);
+	})
 }
 
 runBCDnD();
