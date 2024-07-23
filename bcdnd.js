@@ -51,9 +51,22 @@ async function runBCDnD() {
     ];
 
     // Make a function to roll a d20 with the option of adding a modifier and check the dice roll against trapArray.difficulty
-    function rollD20(modifier) {
+    function rollD20(modifier, trap) {
         let roll = Math.floor(Math.random() * 20) + 1;
-        return roll + modifier;
+        if (modifier) {
+            roll += modifier;
+            if (roll < trap.difficultyMultiplier * trap.difficultyOffset + trap.difficultyOffset2) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            if (roll < trap.difficultyMultiplier * trap.difficultyOffset + trap.difficultyOffset2) {
+                return true;
+            } else {
+                return false;
+            }
+        }
     }
 
 
@@ -63,11 +76,13 @@ async function runBCDnD() {
                 for (let j = 0; j < ChatRoomCharacter.length; j++) {
                     if (InventoryGet(ChatRoomCharacter[j], trapArray[i].slot) == null && trapArray[i].active == true) {
                         if (ChatRoomCharacter[j].MapData.Pos.X == trapArray[i].position.X && ChatRoomCharacter[j].MapData.Pos.Y == trapArray[i].position.Y) {
-                            trapArray[i].active = false;
-                            InventoryWear(ChatRoomCharacter[j], trapArray[i].name, trapArray[i].slot, trapArray[i].color, 5, ChatRoomCharacter[j].ID, null, true);
-                            ServerSend("ChatRoomChat", { Content: trapArray[i].dialog, Type: "Emote", Target: ChatRoomCharacter[j].MemberNumber });
-                            ChatRoomCharacterUpdate(ChatRoomCharacter[j]);
-                            setTimeout(trapArray[i].active = true, 5000);
+                            if (rollD20(0, trapArray[i]) == false) {
+                                InventoryWear(ChatRoomCharacter[j], trapArray[i].name, trapArray[i].slot, trapArray[i].color, 5, ChatRoomCharacter[j].ID, null, true);
+                                ServerSend("ChatRoomChat", { Content: trapArray[i].dialog, Type: "Emote", Target: ChatRoomCharacter[j].MemberNumber });
+                                ChatRoomCharacterUpdate(ChatRoomCharacter[j]);
+                            } else {
+                                ServerSend("ChatRoomChat", { Content: "managed to narrowly avoid the trap.", Type: "Emote", Target: ChatRoomCharacter[j].MemberNumber });
+                            }
                         }
                     }
                 }
