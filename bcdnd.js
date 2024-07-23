@@ -34,7 +34,7 @@ async function runBCDnD() {
 
     if (ChatRoomCharacter.Mapdata) {
         for (let i = 0; i < ChatRoomCharacter.length; i++) {
-            if(ChatRoomCharacter[i].Mapdata.Pos.X == 10 && ChatRoomCharacter[i].Mapdata.Pos.Y == 10) {
+            if (ChatRoomCharacter[i].MapData && ChatRoomCharacter[i].MapData.Pos.X == 10 && ChatRoomCharacter[i].MapData.Pos.Y == 10) {
                 console.log("Found character at 10, 10");
                 InventoryWear(ChatRoomCharacter[i], trapArray[0].name, trapArray[0].slot, trapArray[0].color, 5, ChatRoomCharacter[i].ID, null, true);
                 ChatRoomCharacterUpdate(ChatRoomCharacter[i]);
