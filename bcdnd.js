@@ -1,7 +1,7 @@
 const BCDnDVersion = "0.0.1";
 
 async function runBCDnD() {
-    await waitFor(() => ServerSocket && ServerIsConnected);
+    //await waitFor(() => ServerSocket && ServerIsConnected);
 
     // Bondage Club Mod Development Kit (1.2.0)
 	// For more info see: https://github.com/Jomshir98/bondage-club-mod-sdk
