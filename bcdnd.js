@@ -61,7 +61,7 @@ async function runBCDnD() {
         if (Player.MapData) {
             for (let i = 0; i < trapArray.length; i++) {
                 for (let j = 0; j < ChatRoomCharacter.length; j++) {
-                    if (InventoryGet(ChatRoomCharacter[j], trapArray[i].slot) == null && trapArray[i].active) {
+                    if (InventoryGet(ChatRoomCharacter[j], trapArray[i].slot) == null && trapArray[i].active == true) {
                         if (ChatRoomCharacter[j].MapData.Pos.X == trapArray[i].position.X && ChatRoomCharacter[j].MapData.Pos.Y == trapArray[i].position.Y) {
                             trapArray[i].active = false;
                             InventoryWear(ChatRoomCharacter[j], trapArray[i].name, trapArray[i].slot, trapArray[i].color, 5, ChatRoomCharacter[j].ID, null, true);
