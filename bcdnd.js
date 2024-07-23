@@ -76,8 +76,10 @@ async function runBCDnD() {
             }
                 */
 
-    modAPI.hookFunction('TimerProcess', 1, (args, next) => { 
-		checkTrap();
+    modAPI.hookFunction('TimerProcess', 2, (args, next) => { 
+		if (Player.MapData) {
+            checkTrap();
+        }
 		next(args);
 	})
 }
