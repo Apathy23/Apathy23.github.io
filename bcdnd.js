@@ -1,41 +1,7 @@
 const BCDnDVersion = "0.0.1";
 
 async function runBCDnD() {
-    //await waitFor(() => ServerSocket && ServerIsConnected);
-
-
-    let ChatRoomCharacterArray = [];
-
-    class Trap {
-        constructor(name, assetName, assetGroup, message, isActive, positionX, positionY) {
-            this.name = name;
-            this.assetName = assetName;
-            this.assetGroup = assetGroup;
-            this.message = message;
-            this.isActive = isActive;
-            this.positionX = positionX;
-            this.positionY = positionY;
-        }
-
-        changeRestraint(newRestraint) {
-            this.restraint = newRestraint;
-        }
-
-        activate() {
-            this.isActive = true;
-        }
-
-        deactivate() {
-            this.isActive = false;
-        }
-
-        move(newPositionX, newPositionY) {
-            this.positionX = newPositionX;
-            this.positionY = newPositionY;
-        }
-    }
-
-
+    await waitFor(() => ServerSocket && ServerIsConnected);
 
     // Bondage Club Mod Development Kit (1.2.0)
 	// For more info see: https://github.com/Jomshir98/bondage-club-mod-sdk
@@ -49,18 +15,32 @@ async function runBCDnD() {
 		repository: 'https://github.com/apathy23/bcdnd',
 	});
 
-    let shackleTrap = new Trap("Shackle Trap", "AnkleShackles", "ItemFeet", "You are shackled.", true, 20, 20);
+    trapArray = [
+        {
+            name: "Ankle Shackles",
+            slot: "ItemFeet",
+            color: null,
+            craftName: null,
+            craftDescription: "",
+            itemTypeRecord: {},
+            dialog: "As you step on the trap, you feel a sudden weight on your feet. You look down to see a pair of shackles around your ankles.",
+            lock: "",
+            difficultyMultiplier: 1,
+            difficultyOffset: 0,
+            difficultyOffset2: 5,
+            id: 0
+        },
+    ];
 
-
-        ChatRoomCharacter.forEach(char => {
-            if (!char.Mapdata) return;
-            if (char.Mapdata.Pos.X == shackleTrap.positionX && char.Mapdata.Pos.Y == shackleTrap.positionY && shackleTrap.isActive) {
-                shackleTrap.deactivate();
-                InventoryWear(char, shackleTrap.assetName, shackleTrap.assetGroup, null, 5, 66317, null, true);
-                ChatRoomCharacterUpdate(char);
+    if (ChatRoomCharacter.Mapdata) {
+        for (let i = 0; i < ChatRoomCharacter.length; i++) {
+            if(ChatRoomCharacter[i].Mapdata.Pos.X == 10 && ChatRoomCharacter[i].Mapdata.Pos.Y == 10) {
+                console.log("Found character at 10, 10");
+                InventoryWear(ChatRoomCharacter[i], trapArray[0].name, trapArray[0].slot, trapArray[0].color, 5, ChatRoomCharacter[i].ID, null, true);
+                ChatRoomCharacterUpdate(ChatRoomCharacter[i]);
             }
-        });
+        }
+    }
 }
 
 runBCDnD();
-
