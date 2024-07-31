@@ -29,7 +29,7 @@ async function runBCDnD() {
             this.difficultyOffset = difficultyOffset;
             this.difficultyOffset2 = difficultyOffset2;
             this.position = position;
-            this.active = active;
+            this.isActive = active;
         }
     }
 
@@ -99,16 +99,16 @@ async function runBCDnD() {
      * @param {Map} map
      * @param {Trap} trap
      */
-    function addDndTrap(position, trap) {
-        dndTrapMap.set(position, trap);
+    function addDndTrap(trap) {
+        dndTrapMap.set(`${trap.position.X},${trap.position.Y}`, trap);
     }
 
     function removeDndTrap(position) {
         dndTrapMap.delete(position);
     }
 
-    function addAsylumTrap(position, trap) {
-        asylumTrapMap.set(position, trap);
+    function addAsylumTrap(trap) {
+        asylumTrapMap.set(`${trap.position.X},${trap.position.Y}`, trap);
     }
 
     function removeAsylumTrap(position) {
@@ -156,12 +156,13 @@ async function runBCDnD() {
      */
     function checkAsylumTraps() {
         if (!Player.MapData) return;
-        for (const [position, trap] of asylumTrapMap) {
+        for (const trap of asylumTrapMap.values()) {
             if (trap.isActive) {
                 for (const C of ChatRoomCharacter) {
-                    if (C.MapData.Pos.X === trap.position.X && C.MapData.Pos.Y === trap.position.Y) {
+                    if (C.MapData && C.MapData.Pos.X === trap.position.X && C.MapData.Pos.Y === trap.position.Y) {
                         applyRestraint(C, trap.name, trap.slot, trap.color, 5, null);
                         trap.isActive = false;
+                        ServerSend("ChatRoomChat", { Content: trap.dialog, Type: "Emote", Target: C.MemberNumber });
                     }
                 }
             }
@@ -205,7 +206,8 @@ async function runBCDnD() {
     }
 
     addAsylumTrap(new Trap("AnkleShackles", "ItemFeet", null, null, "", {}, 
-        "As you step on the trap, you feel a sudden weight on your feet. You look down to see a pair of shackles around your ankles.", "", 1, 0, 5, { X: 11, Y: 10}, true));
+        "As you step on the trap, you feel a sudden weight on your feet. You look down to see a pair of shackles around your ankles.", 
+        "", 1, 0, 5, { X: 11, Y: 10}, true));
 
     modAPI.hookFunction('TimerProcess', 2, (args, next) => { 
 		if (currentMode === "dnd") {
