@@ -28,12 +28,29 @@ async function runBCDnD() {
     }
 
     class Trap {
-        constructor(name, dialog, position, restraints, active) {
+        constructor(name, dialog, position, restraints, active = true, cooldown = 5000) {
             this.name = name;
             this.dialog = dialog;
             this.position = position;
             this.restraints = restraints;
             this.isActive = active;
+            this.cooldown = cooldown; // Cooldown in ms (e.g. 5000ms = 5s)
+            this.lastTrigger = 0;
+        }
+
+        canTrigger() {
+            return this.isActive && (Date.now() - this.lastTrigger) > this.cooldown;
+        }
+
+        trigger() {
+            this.isActive = false;
+            this.lastTrigger = Date.now();
+        }
+
+        reset() {
+            if (Date.now() - this.lastTrigger > this.cooldown) {
+                this.isActive = true;
+            }
         }
     }
 
@@ -76,18 +93,31 @@ async function runBCDnD() {
         trapMap.get(key).push(trap);
     }
 
+    /**
+     * 
+     * @param {map} trapMap 
+     */
     function checkTraps(trapMap) {
         for (const [positionKey, traps] of trapMap.entries()) {
             const [x, y] = positionKey.split(',').map(Number);
             for (const C of ChatRoomCharacter) {
                 if (C.MapData && C.MapData.Pos.X === x && C.MapData.Pos.Y === y) {
                     for (const trap of traps) {
-                        for (const restraint of trap.restraints) {
-                            applyRestraint(C, restraint.name, restraint.slot, restraint.color, restraint.difficulty);
+                        trap.reset();
+                        if (trap.canTrigger()) {
+                            let restraintsApplied = false;
+                            for (const restraint of trap.restraints) {
+                                if (!InventoryGet(C, restraint.slot)) {
+                                    applyRestraint(C, restraint.name, restraint.slot, restraint.color, restraint.difficulty);
+                                    restraintsApplied = true;
+                                }
+                            }
+                            if (restraintsApplied) {
+                                ServerSend("ChatRoomChat", { Content: trap.dialog, Type: "Emote", Target: C.MemberNumber });
+                                ChatRoomCharacterUpdate(C);
+                                trap.trigger();
+                            }
                         }
-                        ChatRoomCharacterUpdate(C);
-                        ServerSend("ChatRoomChat", { Content: trap.dialog, Type: "Emote", Target: C.MemberNumber });
-                        trap.isActive = false;
                     }
                 }
             }
@@ -108,7 +138,6 @@ async function runBCDnD() {
     /*
     * Asylum Section
     */
-
     function asylumMainLoop() {
         checkTraps(asylumTrapMap);
         trackCollaredPatients();
