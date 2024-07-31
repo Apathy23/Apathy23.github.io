@@ -189,7 +189,7 @@ async function runBCDnD() {
     /**
      * Controls which mainloop to run
      */
-    let currentMode = "dnd";
+    let currentMode = "asylum";
 
     /**
      * Swap betweens dnd and asylum main loops
