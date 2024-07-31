@@ -14,59 +14,28 @@ async function runBCDnD() {
 		repository: 'https://github.com/apathy23/bcdnd',
 	});
 
-
-    class Trap {
-        constructor(name, slot, color, craftName, craftDescription, itemTypeRecord, dialog, lock, difficultyMultiplier, difficultyOffset, difficultyOffset2, position, active) {
+    class Restraint {
+        constructor(name, slot, color, lock, difficulty, craftName, craftDescription, itemTypeRecord) {
             this.name = name;
             this.slot = slot;
             this.color = color;
+            this.lock = lock;
+            this.difficulty = difficulty;
             this.craftName = craftName;
             this.craftDescription = craftDescription;
             this.itemTypeRecord = itemTypeRecord;
-            this.dialog = dialog;
-            this.lock = lock;
-            this.difficultyMultiplier = difficultyMultiplier;
-            this.difficultyOffset = difficultyOffset;
-            this.difficultyOffset2 = difficultyOffset2;
-            this.position = position;
-            this.isActive = active;
         }
     }
 
-    trapArray = [
-        {
-            name: "AnkleShackles",
-            slot: "ItemFeet",
-            color: null,
-            craftName: null,
-            craftDescription: "",
-            itemTypeRecord: {},
-            dialog: "As you step on the trap, you feel a sudden weight on your feet. You look down to see a pair of shackles around your ankles.",
-            lock: "",
-            difficultyMultiplier: 1,
-            difficultyOffset: 0,
-            difficultyOffset2: 5,
-            id: 0,
-            position: { X: 11, Y: 10},
-            active: true
-        },
-        {
-            name: "Slime",
-            slot: "ItemFeet",
-            color: null,
-            craftName: null,
-            craftDescription: "",
-            itemTypeRecord: {},
-            dialog: "A wet and sticky substance covers your feet as you step on the trap. You feel your feet being pulled down into the ground.",
-            lock: "",
-            difficultyMultiplier: 1,
-            difficultyOffset: 0,
-            difficultyOffset2: 5,
-            id: 0,
-            position: { X: 10, Y: 10},
-            active: true
+    class Trap {
+        constructor(name, dialog, position, restraints, active) {
+            this.name = name;
+            this.dialog = dialog;
+            this.position = position;
+            this.restraints = restraints;
+            this.isActive = active;
         }
-    ];
+    }
 
     /**
      * 
@@ -99,30 +68,26 @@ async function runBCDnD() {
      * @param {Map} map
      * @param {Trap} trap
      */
-    function addDndTrap(trap) {
-        dndTrapMap.set(`${trap.position.X},${trap.position.Y}`, trap);
+    function addTrap(trapMap, trap) {
+        const key = `${trap.position.X},${trap.position.Y}`;
+        if (!trapMap.has(key)) {
+            trapMap.set(key, []);
+        }
+        trapMap.get(key).push(trap);
     }
 
-    function removeDndTrap(position) {
-        dndTrapMap.delete(position);
-    }
-
-    function addAsylumTrap(trap) {
-        asylumTrapMap.set(`${trap.position.X},${trap.position.Y}`, trap);
-    }
-
-    function removeAsylumTrap(position) {
-        asylumTrapMap.delete(position);
-    }
-
-    function checkTrap() {
-        for (let i = 0; i < trapArray.length; i++) {
-            for (let j = 0; j < ChatRoomCharacter.length; j++) {
-                if (InventoryGet(ChatRoomCharacter[j], trapArray[i].slot) == null && trapArray[i].active == true) {
-                    if (ChatRoomCharacter[j].MapData.Pos.X == trapArray[i].position.X && ChatRoomCharacter[j].MapData.Pos.Y == trapArray[i].position.Y) {
-                        InventoryWear(ChatRoomCharacter[j], trapArray[i].name, trapArray[i].slot, trapArray[i].color, 5, ChatRoomCharacter[j].ID, null, true);
-                        ServerSend("ChatRoomChat", { Content: trapArray[i].dialog, Type: "Emote", Target: ChatRoomCharacter[j].MemberNumber });
-                        ChatRoomCharacterUpdate(ChatRoomCharacter[j]);
+    function checkTraps(trapMap) {
+        for (const [positionKey, traps] of trapMap.entries()) {
+            const [x, y] = positionKey.split(',').map(Number);
+            for (const C of ChatRoomCharacter) {
+                if (C.MapData && C.MapData.Pos.X === x && C.MapData.Pos.Y === y) {
+                    for (const trap of traps) {
+                        for (const restraint of trap.restraints) {
+                            applyRestraint(C, restraint.name, restraint.slot, restraint.color, restraint.difficulty);
+                        }
+                        ChatRoomCharacterUpdate(C);
+                        ServerSend("ChatRoomChat", { Content: trap.dialog, Type: "Emote", Target: C.MemberNumber });
+                        trap.isActive = false;
                     }
                 }
             }
@@ -133,7 +98,7 @@ async function runBCDnD() {
     * DnD Section
     */
     function dndMainLoop() {
-        checkTrap();
+        checkTraps(dndTrapMap);
     }
 
     /*
@@ -145,28 +110,8 @@ async function runBCDnD() {
     */
 
     function asylumMainLoop() {
-        checkAsylumTraps();
+        checkTraps(asylumTrapMap);
         trackCollaredPatients();
-    }
-
-    /**
-     * Checks if a character is stepping on an asylum trap
-     * and applies the restraint if they are
-     * only runs in asylum mode
-     */
-    function checkAsylumTraps() {
-        if (!Player.MapData) return;
-        for (const trap of asylumTrapMap.values()) {
-            if (trap.isActive) {
-                for (const C of ChatRoomCharacter) {
-                    if (C.MapData && C.MapData.Pos.X === trap.position.X && C.MapData.Pos.Y === trap.position.Y) {
-                        applyRestraint(C, trap.name, trap.slot, trap.color, 5, null);
-                        trap.isActive = false;
-                        ServerSend("ChatRoomChat", { Content: trap.dialog, Type: "Emote", Target: C.MemberNumber });
-                    }
-                }
-            }
-        }
     }
 
     /**
@@ -196,7 +141,8 @@ async function runBCDnD() {
      * Swap betweens dnd and asylum main loops
      * @param {String} mode 
      */
-    function switchMode(mode) {
+    window.BCDnD = window.BCDnD || {};
+    BCDnD.switchMode = function(mode) {
         if (mode === "dnd" || mode === "asylum") {
             currentMode = mode;
             console.log(`Switched to ${mode} mode`);
@@ -205,9 +151,13 @@ async function runBCDnD() {
         }
     }
 
-    addAsylumTrap(new Trap("AnkleShackles", "ItemFeet", null, null, "", {}, 
-        "As you step on the trap, you feel a sudden weight on your feet. You look down to see a pair of shackles around your ankles.", 
-        "", 1, 0, 5, { X: 11, Y: 10}, true));
+    const ankleShackles = new Restraint("AnkleShackles", "ItemFeet", "", null, 5)
+    const leatherCollar = new Restraint("LeatherCollar", "ItemNeck", "", null, 5)
+
+    const complexTrap = new Trap("Enslaving Trap", "Testing purposes dialog", { X: 20, Y: 21}, [ankleShackles, leatherCollar], true);
+
+    addTrap(dndTrapMap, complexTrap);
+    addTrap(asylumTrapMap, complexTrap);
 
     modAPI.hookFunction('TimerProcess', 2, (args, next) => { 
 		if (currentMode === "dnd") {
