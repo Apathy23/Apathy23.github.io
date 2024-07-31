@@ -1,7 +1,6 @@
 const BCDnDVersion = "0.0.1";
 
 async function runBCDnD() {
-    //await waitFor(() => ServerSocket && ServerIsConnected);
 
     // Bondage Club Mod Development Kit (1.2.0)
 	// For more info see: https://github.com/Jomshir98/bondage-club-mod-sdk
@@ -14,6 +13,25 @@ async function runBCDnD() {
 		version: BCDnDVersion,
 		repository: 'https://github.com/apathy23/bcdnd',
 	});
+
+
+    class Trap {
+        constructor(name, slot, color, craftName, craftDescription, itemTypeRecord, dialog, lock, difficultyMultiplier, difficultyOffset, difficultyOffset2, position, active) {
+            this.name = name;
+            this.slot = slot;
+            this.color = color;
+            this.craftName = craftName;
+            this.craftDescription = craftDescription;
+            this.itemTypeRecord = itemTypeRecord;
+            this.dialog = dialog;
+            this.lock = lock;
+            this.difficultyMultiplier = difficultyMultiplier;
+            this.difficultyOffset = difficultyOffset;
+            this.difficultyOffset2 = difficultyOffset2;
+            this.position = position;
+            this.active = active;
+        }
+    }
 
     trapArray = [
         {
@@ -50,6 +68,52 @@ async function runBCDnD() {
         }
     ];
 
+    /**
+     * 
+     * @param {ChatRoomCharacter} character 
+     * @param {Trap.name} trapName 
+     * @param {Trap.slot} trapSlot 
+     * @param {Trap.color} color // HEX color
+     * @param {Trap.difficulty} difficulty 
+     * @param {Trap.craftName} craft
+     */
+    // TODO: Add craft to the function if craftName is not null
+    function applyRestraint(character, trapName, trapSlot, color, difficulty, craft) {
+        InventoryWear(character, trapName, trapSlot, color, difficulty, character.ID, craft, true);
+        ChatRoomCharacterUpdate(character);
+    }
+
+    /*
+    * Maps for the dnd and asylum traps to keep them separate
+    */
+    
+    // DnD
+    const dndTrapMap = new Map();
+
+    // Asylum
+    const asylumTrapMap = new Map();
+    const collaredPlayers = new Map();
+    
+    /**
+     * Helper functions to quickly add and remove traps
+     * @param {Map} map
+     * @param {Trap} trap
+     */
+    function addDndTrap(map, trap) {
+        map.set(trap.position, trap);
+    }
+
+    function removeDndTrap(map, trap) {
+        map.delete(trap.position);
+    }
+
+    function addAsylumTrap(map, trap) {
+        map.set(trap.position, trap);
+    }
+
+    function removeAsylumTrap(map, trap) {
+        map.delete(trap.position);
+    }
 
     function checkTrap() {
         for (let i = 0; i < trapArray.length; i++) {
@@ -64,21 +128,89 @@ async function runBCDnD() {
             }
         }
     }
-            /*
-            for (let i = 0; i < ChatRoomCharacter.length; i++) {
-                if (InventoryGet(ChatRoomCharacter[i], "ItemFeet") == null) {
-                    if (ChatRoomCharacter[i].MapData && ChatRoomCharacter[i].MapData.Pos.X == 10 && ChatRoomCharacter[i].MapData.Pos.Y == 10) {
-                        console.log("Found character at 10, 10");
-                        InventoryWear(ChatRoomCharacter[i], trapArray[0].name, trapArray[0].slot, trapArray[0].color, 5, ChatRoomCharacter[i].ID, null, true);
-                        ChatRoomCharacterUpdate(ChatRoomCharacter[i]);
+
+    /*
+    * DnD Section
+    */
+    function dndMainLoop() {
+        checkTrap();
+    }
+
+    /*
+    * END OF DnD SECTION
+    */
+
+    /*
+    * Asylum Section
+    */
+
+    function asylumMainLoop() {
+        checkAsylumTraps();
+        trackCollaredPatients();
+    }
+
+    /**
+     * Checks if a character is stepping on an asylum trap
+     * and applies the restraint if they are
+     * only runs in asylum mode
+     */
+    function checkAsylumTraps() {
+        for (const [position, trap] of asylumTrapMap) {
+            if (trap.isActive) {
+                for (const C of ChatRoomCharacter) {
+                    if (C.MapData.Pos.X === trap.position.X && C.MapData.Pos.Y === trap.position.Y) {
+                        applyRestraint(C, trap.name, trap.slot, trap.color, 5, null);
+                        trap.isActive = false;
                     }
                 }
             }
-                */
+        }
+    }
+
+    /**
+     * Keeps track of collared patients in the asylum
+     * TODO check what zone in the asylum they are in
+     */
+    function trackCollaredPatients() {
+        for (const C of ChatRoomCharacter) {
+            if (InventoryGet(C, "ItemNeck")?.Asset.Name === "Asylum Collar") {
+                collaredPlayers.set(C.MemberNumber, C.MapData.Pos);
+            } else {
+                collaredPlayers.delete(C.MemberNumber);
+            }
+        }
+    }
+
+    /**
+    * END OF ASYLUM SECTION
+    */
+
+    /**
+     * Controls which mainloop to run
+     */
+    let currentMode = "dnd";
+
+    /**
+     * Swap betweens dnd and asylum main loops
+     * @param {String} mode 
+     */
+    function switchMode(mode) {
+        if (mode === "dnd" || mode === "asylum") {
+            currentMode = mode;
+            console.log(`Switched to ${mode} mode`);
+        } else {
+            console.log("Invalid mode. Use 'dnd' or 'asylum'");
+        }
+    }
+
+    addAsylumTrap(new Trap("AnkleShackles", "ItemFeet", null, null, "", {}, 
+        "As you step on the trap, you feel a sudden weight on your feet. You look down to see a pair of shackles around your ankles.", "", 1, 0, 5, { X: 11, Y: 10}, true));
 
     modAPI.hookFunction('TimerProcess', 2, (args, next) => { 
-		if (Player.MapData) {
-            checkTrap();
+		if (currentMode === "dnd") {
+            dndMainLoop();
+        } else if (currentMode === "asylum") {
+            asylumMainLoop();
         }
 		next(args);
 	})
