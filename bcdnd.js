@@ -99,20 +99,20 @@ async function runBCDnD() {
      * @param {Map} map
      * @param {Trap} trap
      */
-    function addDndTrap(map, trap) {
-        map.set(trap.position, trap);
+    function addDndTrap(position, trap) {
+        dndTrapMap.set(position, trap);
     }
 
-    function removeDndTrap(map, trap) {
-        map.delete(trap.position);
+    function removeDndTrap(position) {
+        dndTrapMap.delete(position);
     }
 
-    function addAsylumTrap(map, trap) {
-        map.set(trap.position, trap);
+    function addAsylumTrap(position, trap) {
+        asylumTrapMap.set(position, trap);
     }
 
-    function removeAsylumTrap(map, trap) {
-        map.delete(trap.position);
+    function removeAsylumTrap(position) {
+        asylumTrapMap.delete(position);
     }
 
     function checkTrap() {
