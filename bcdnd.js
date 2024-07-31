@@ -116,6 +116,7 @@ async function runBCDnD() {
     }
 
     function checkTrap() {
+        if (!Player.MapData) return;
         for (let i = 0; i < trapArray.length; i++) {
             for (let j = 0; j < ChatRoomCharacter.length; j++) {
                 if (InventoryGet(ChatRoomCharacter[j], trapArray[i].slot) == null && trapArray[i].active == true) {
@@ -155,6 +156,7 @@ async function runBCDnD() {
      * only runs in asylum mode
      */
     function checkAsylumTraps() {
+        if (!Player.MapData) return;
         for (const [position, trap] of asylumTrapMap) {
             if (trap.isActive) {
                 for (const C of ChatRoomCharacter) {
