@@ -116,15 +116,13 @@ async function runBCDnD() {
     }
 
     function checkTrap() {
-        if (Player.MapData) {
-            for (let i = 0; i < trapArray.length; i++) {
-                for (let j = 0; j < ChatRoomCharacter.length; j++) {
-                    if (InventoryGet(ChatRoomCharacter[j], trapArray[i].slot) == null && trapArray[i].active == true) {
-                        if (ChatRoomCharacter[j].MapData.Pos.X == trapArray[i].position.X && ChatRoomCharacter[j].MapData.Pos.Y == trapArray[i].position.Y) {
-                            InventoryWear(ChatRoomCharacter[j], trapArray[i].name, trapArray[i].slot, trapArray[i].color, 5, ChatRoomCharacter[j].ID, null, true);
-                            ServerSend("ChatRoomChat", { Content: trapArray[i].dialog, Type: "Emote", Target: ChatRoomCharacter[j].MemberNumber });
-                            ChatRoomCharacterUpdate(ChatRoomCharacter[j]);
-                        }
+        for (let i = 0; i < trapArray.length; i++) {
+            for (let j = 0; j < ChatRoomCharacter.length; j++) {
+                if (InventoryGet(ChatRoomCharacter[j], trapArray[i].slot) == null && trapArray[i].active == true) {
+                    if (ChatRoomCharacter[j].MapData.Pos.X == trapArray[i].position.X && ChatRoomCharacter[j].MapData.Pos.Y == trapArray[i].position.Y) {
+                        InventoryWear(ChatRoomCharacter[j], trapArray[i].name, trapArray[i].slot, trapArray[i].color, 5, ChatRoomCharacter[j].ID, null, true);
+                        ServerSend("ChatRoomChat", { Content: trapArray[i].dialog, Type: "Emote", Target: ChatRoomCharacter[j].MemberNumber });
+                        ChatRoomCharacterUpdate(ChatRoomCharacter[j]);
                     }
                 }
             }
@@ -211,9 +209,13 @@ async function runBCDnD() {
 
     modAPI.hookFunction('TimerProcess', 2, (args, next) => { 
 		if (currentMode === "dnd") {
-            dndMainLoop();
+            if (Player.MapData) {
+                dndMainLoop();
+            }
         } else if (currentMode === "asylum") {
-            asylumMainLoop();
+            if (Player.MapData) {
+                asylumMainLoop();
+            }
         }
 		next(args);
 	})
