@@ -14,6 +14,11 @@ async function runBCDnD() {
 		repository: 'https://github.com/apathy23/bcdnd',
 	});
 
+    /**
+     * Restraint class
+     * define what type of restraint to apply
+     * then use it when creating a trap
+     */
     class Restraint {
         constructor(name, slot, color, lock, difficulty, craftName, craftDescription, itemTypeRecord) {
             this.name = name;
@@ -54,14 +59,51 @@ async function runBCDnD() {
         }
     }
 
+    // NOT IMPLEMENTED YET
+    /**
+     * Zone class
+     * define a zone in the map
+     */
+    class Zone {
+        constructor(name, topLeft, bottomRight) {
+            this.name = name;
+            this.topLeft = topLeft;
+            this.bottomRight = bottomRight;
+        }
+
+        containsPoint(x, y) {
+            return x >= this.topLeft.X && x <= this.bottomRight.X && y >= this.topLeft.Y && y <= this.bottomRight.Y;
+        }
+    }
+
+    // NOT IMPLEMENTED YET
+    class ZoneManager {
+        constructor() {
+            this.zones = new Map();
+        }
+
+        addZone(zone) {
+            this.zones.set(zone.name, zone);
+        }
+
+        getZone(name) {
+            for (const zone of this.zones.values()) {
+                if (zone.containsPoint(x, y)) {
+                    return zone;
+                }
+            }
+            return null;
+        }
+    }
+
     /**
      * 
      * @param {ChatRoomCharacter} character 
-     * @param {Trap.name} trapName 
-     * @param {Trap.slot} trapSlot 
-     * @param {Trap.color} color // HEX color
-     * @param {Trap.difficulty} difficulty 
-     * @param {Trap.craftName} craft
+     * @param {String} trapName 
+     * @param {String} trapSlot 
+     * @param {String} color // HEX color
+     * @param {Int} difficulty 
+     * @param {String} craft
      */
     // TODO: Add craft to the function if craftName is not null
     function applyRestraint(character, trapName, trapSlot, color, difficulty, craft) {
@@ -154,6 +196,28 @@ async function runBCDnD() {
             } else {
                 collaredPlayers.delete(C.MemberNumber);
             }
+        }
+    }
+
+
+    // NOT IMPLEMENTED YET
+
+    // CHECK PLAYER ZONES FOR ASYLUM
+    // TODO: Add punishments for leaving the designated zone
+    // TODO: Add a way to track the designated zone
+    // TODO: store player's designated zone in the collaredPlayers map
+    // TODO: Change designated zone based on collar
+    // TODO: Make sure player can still walk around in undesignated zones as long as they are permitted
+    function checkPlayerZones(C) {
+        const collar = InventoryGet(C, "ItemNeck");
+        if (collar && collar.Asset.Name === "Asylum Collar") {
+            const designatedZone = new Zone("Designated Zone", { X: 20, Y: 20 }, { X: 30, Y: 30 });
+            const currentZone = zoneManager.getZone(C.MapData.Pos.X, C.MapData.Pos.Y);
+
+            if (currentZone && currentZone.name !== designatedZone.name) {
+                ServerSend("ChatRoomChat", { Content: "You are not allowed to leave the designated zone", Type: "Emote", Target: C.MemberNumber });
+            }
+            // TODO ADD PUNISHMENTS HERE
         }
     }
 
