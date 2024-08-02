@@ -108,9 +108,19 @@ async function runBCDnD() {
     // TODO: Add craft to the function if craftName is not null
     function applyRestraint(character, trapName, trapSlot, color, difficulty, craft, lock) {
         InventoryWear(character, trapName, trapSlot, color, difficulty, character.ID, craft, true);
-        if (lock != null) {
-            item = InventoryGet(character, trapSlot);
-            InventoryLock(character, item, lock, 66317, false);
+        if (lock) {
+            const item = InventoryGet(character, trapSlot);
+            if (item) {
+                // Check if the item can be locked
+                if (item.Asset.AllowLock) {
+                    InventoryLock(character, item, lock, Player.MemberNumber, false);
+                    console.log(`Locked ${trapName} on ${character.Name} with ${lock}`);
+                } else {
+                    console.log(`Cannot lock ${trapName} as it doesn't allow locks`);
+                }
+            } else {
+                console.log(`Failed to get item ${trapName} from slot ${trapSlot}`);
+            }
         }
         ChatRoomCharacterUpdate(character);
     }
@@ -154,7 +164,7 @@ async function runBCDnD() {
                             let restraintsApplied = false;
                             for (const restraint of trap.restraints) {
                                 if (!InventoryGet(C, restraint.slot)) {
-                                    applyRestraint(C, restraint.name, restraint.slot, restraint.color, restraint.difficulty);
+                                    applyRestraint(C, restraint.name, restraint.slot, restraint.color, restraint.difficulty, null, restraint.lock);
                                     restraintsApplied = true;
                                 }
                             }
