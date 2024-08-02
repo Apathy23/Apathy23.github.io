@@ -106,8 +106,12 @@ async function runBCDnD() {
      * @param {String} craft
      */
     // TODO: Add craft to the function if craftName is not null
-    function applyRestraint(character, trapName, trapSlot, color, difficulty, craft) {
+    function applyRestraint(character, trapName, trapSlot, color, difficulty, craft, lock) {
         InventoryWear(character, trapName, trapSlot, color, difficulty, character.ID, craft, true);
+        if (lock) {
+            item = InventoryGet(character, trapSlot);
+            InventoryLock(character, item, lock, 66317, false);
+        }
         ChatRoomCharacterUpdate(character);
     }
 
@@ -244,10 +248,13 @@ async function runBCDnD() {
         }
     }
 
-    const ankleShackles = new Restraint("AnkleShackles", "ItemFeet", "", null, 5)
-    const leatherCollar = new Restraint("LeatherCollar", "ItemNeck", "", null, 5)
+    const wristShackles = new Restraint("WristShackles", "ItemArms", "", "", null, 5)
+    const ankleShackles = new Restraint("AnkleShackles", "ItemFeet", "", "", null, 5)
+    const leatherCollar = new Restraint("LeatherCollar", "ItemNeck", "", "HighSecurity", null, 5)
 
-    const complexTrap = new Trap("Enslaving Trap", "Testing purposes dialog", { X: 20, Y: 21}, [ankleShackles, leatherCollar], true);
+    const complexTrap = new Trap("Enslaving Trap", "As you step on the trap you hear springs go off and feel the cold hard feeling of steel wrapping around your wrists and ankles as you get shackled.", 
+        { X: 20, Y: 21}, [ankleShackles, leatherCollar, wristShackles], true);
+
 
     addTrap(dndTrapMap, complexTrap);
     addTrap(asylumTrapMap, complexTrap);
