@@ -248,9 +248,9 @@ async function runBCDnD() {
         }
     }
 
-    const wristShackles = new Restraint("WristShackles", "ItemArms", "", "", null, 5)
-    const ankleShackles = new Restraint("AnkleShackles", "ItemFeet", "", "", null, 5)
-    const leatherCollar = new Restraint("LeatherCollar", "ItemNeck", "", "HighSecurity", null, 5)
+    const wristShackles = new Restraint("WristShackles", "ItemArms", "", "", null, 5);
+    const ankleShackles = new Restraint("AnkleShackles", "ItemFeet", "", "", null, 5);
+    const leatherCollar = new Restraint("LeatherCollar", "ItemNeck", "", "HighSecurityPadlock", null, 5);
 
     const complexTrap = new Trap("Enslaving Trap", "As you step on the trap you hear springs go off and feel the cold hard feeling of steel wrapping around your wrists and ankles as you get shackled.", 
         { X: 20, Y: 21}, [ankleShackles, leatherCollar, wristShackles], true);
