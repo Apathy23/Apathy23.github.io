@@ -108,7 +108,7 @@ async function runBCDnD() {
     // TODO: Add craft to the function if craftName is not null
     function applyRestraint(character, trapName, trapSlot, color, difficulty, craft, lock) {
         InventoryWear(character, trapName, trapSlot, color, difficulty, character.ID, craft, true);
-        if (lock) {
+        if (lock != null) {
             item = InventoryGet(character, trapSlot);
             InventoryLock(character, item, lock, 66317, false);
         }
@@ -248,8 +248,8 @@ async function runBCDnD() {
         }
     }
 
-    const wristShackles = new Restraint("WristShackles", "ItemArms", "", "", null, 5);
-    const ankleShackles = new Restraint("AnkleShackles", "ItemFeet", "", "", null, 5);
+    const wristShackles = new Restraint("WristShackles", "ItemArms", "", "HighSecurityPadlock", null, 5);
+    const ankleShackles = new Restraint("AnkleShackles", "ItemFeet", "", "HighSecurityPadlock", null, 5);
     const leatherCollar = new Restraint("LeatherCollar", "ItemNeck", "", "HighSecurityPadlock", null, 5);
 
     const complexTrap = new Trap("Enslaving Trap", "As you step on the trap you hear springs go off and feel the cold hard feeling of steel wrapping around your wrists and ankles as you get shackled.", 
