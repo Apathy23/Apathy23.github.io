@@ -279,6 +279,9 @@ async function runBCDnD() {
                 asylumMainLoop();
             }
         }
+        else {
+            next(args);
+        }
 		next(args);
 	})
 }
