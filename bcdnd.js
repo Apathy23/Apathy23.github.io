@@ -269,16 +269,20 @@ async function runBCDnD() {
     addTrap(dndTrapMap, complexTrap);
     addTrap(asylumTrapMap, complexTrap);
 
-    modAPI.hookFunction('TimerProcess', 2, (args, next) => { 
-		if (currentMode === "dnd") {
-            if (Player.MapData) {
-                dndMainLoop();
-            }
+    function BCDnDMainLoop() {
+        if (currentMode === "off") return;
+        
+        if (currentMode === "dnd") {
+            dndMainLoop();
         } else if (currentMode === "asylum") {
-            if (Player.MapData) {
-                asylumMainLoop();
-            }
+            asylumMainLoop();
+        } else {
+            return;
         }
+    }
+
+    modAPI.hookFunction('TimerProcess', 2, (args, next) => { 
+        BCDnDMainLoop();
 		next(args);
 	})
 }
