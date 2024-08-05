@@ -250,7 +250,7 @@ async function runBCDnD() {
      */
     window.BCDnD = window.BCDnD || {};
     BCDnD.switchMode = function(mode) {
-        if (mode === "dnd" || mode === "asylum") {
+        if (mode === "dnd" || mode === "asylum" || mode === "off") {
             currentMode = mode;
             console.log(`Switched to ${mode} mode`);
         } else {
@@ -278,9 +278,6 @@ async function runBCDnD() {
             if (Player.MapData) {
                 asylumMainLoop();
             }
-        }
-        else {
-            next(args);
         }
 		next(args);
 	})
