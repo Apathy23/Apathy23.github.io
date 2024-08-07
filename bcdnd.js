@@ -1,6 +1,7 @@
-const BCDnDVersion = "0.0.2";
+const BCDnDVersion = "0.0.1";
 
 async function runBCDnD() {
+
     // Bondage Club Mod Development Kit (1.2.0)
 	// For more info see: https://github.com/Jomshir98/bondage-club-mod-sdk
 	/** @type {ModSDKGlobalAPI} */
@@ -13,7 +14,11 @@ async function runBCDnD() {
 		repository: 'https://github.com/apathy23/bcdnd',
 	});
 
-    // Classes
+    /**
+     * Restraint class
+     * define what type of restraint to apply
+     * then use it when creating a trap
+     */
     class Restraint {
         constructor(name, slot, color, lock, difficulty, craftName, craftDescription, itemTypeRecord) {
             this.name = name;
@@ -34,7 +39,7 @@ async function runBCDnD() {
             this.position = position;
             this.restraints = restraints;
             this.isActive = active;
-            this.cooldown = cooldown;
+            this.cooldown = cooldown; // Cooldown in ms (e.g. 5000ms = 5s)
             this.lastTrigger = 0;
         }
 
@@ -54,6 +59,11 @@ async function runBCDnD() {
         }
     }
 
+    // NOT IMPLEMENTED YET
+    /**
+     * Zone class
+     * define a zone in the map
+     */
     class Zone {
         constructor(name, topLeft, bottomRight) {
             this.name = name;
@@ -62,11 +72,11 @@ async function runBCDnD() {
         }
 
         containsPoint(x, y) {
-            return x >= this.topLeft.X && x <= this.bottomRight.X &&
-                   y >= this.topLeft.Y && y <= this.bottomRight.Y;
+            return x >= this.topLeft.X && x <= this.bottomRight.X && y >= this.topLeft.Y && y <= this.bottomRight.Y;
         }
     }
 
+    // NOT IMPLEMENTED YET
     class ZoneManager {
         constructor() {
             this.zones = new Map();
@@ -76,7 +86,7 @@ async function runBCDnD() {
             this.zones.set(zone.name, zone);
         }
 
-        getZone(x, y) {
+        getZone(name) {
             for (const zone of this.zones.values()) {
                 if (zone.containsPoint(x, y)) {
                     return zone;
@@ -93,21 +103,36 @@ async function runBCDnD() {
     const zoneManager = new ZoneManager();
     let currentMode = "off";
 
-    // Helper functions
+
+    /**
+     * 
+     * @param {ChatRoomCharacter} character 
+     * @param {String} trapName 
+     * @param {String} trapSlot 
+     * @param {String} color // HEX color
+     * @param {Int} difficulty 
+     * @param {String} craft
+     */
+    // TODO: Add craft to the function if craftName is not null
     function applyRestraint(character, trapName, trapSlot, color, difficulty, craft, lock) {
         InventoryWear(character, trapName, trapSlot, color, difficulty, character.ID, craft, true);
         if (lock) {
             const item = InventoryGet(character, trapSlot);
             if (item && item.Asset.AllowLock) {
-                InventoryLock(character, item, lock, Player.MemberNumber, false);
-                console.log(`Locked ${trapName} on ${character.Name} with ${lock}`);
+                    InventoryLock(character, item, lock, Player.MemberNumber, false);
+                    console.log(`Locked ${trapName} on ${character.Name} with ${lock}`);
             } else {
-                console.log(`Cannot lock ${trapName} on ${trapSlot}`);
+                console.log(`Failed to get item ${trapName} from slot ${trapSlot} or item does not allow locking or specified lock`);
             }
         }
         ChatRoomCharacterUpdate(character);
     }
-
+    
+    /**
+     * Helper functions to quickly add and remove traps
+     * @param {Map} map
+     * @param {Trap} trap
+     */
     function addTrap(trapMap, trap) {
         const key = `${trap.position.X},${trap.position.Y}`;
         if (!trapMap.has(key)) {
@@ -116,6 +141,10 @@ async function runBCDnD() {
         trapMap.get(key).push(trap);
     }
 
+    /**
+     * 
+     * @param {map} trapMap 
+     */
     function checkTraps(trapMap) {
         for (const [positionKey, traps] of trapMap.entries()) {
             const [x, y] = positionKey.split(',').map(Number);
@@ -143,10 +172,45 @@ async function runBCDnD() {
         }
     }
 
+    function BCDnDMainLoop() {
+        if (currentMode === "off") return;
+        
+        if (currentMode === "dnd") {
+            dndMainLoop();
+        } else if (currentMode === "asylum") {
+            asylumMainLoop();
+        } else {
+            return;
+        }
+    }
+
+    /*
+    * DnD Section
+    */
+    function dndMainLoop() {
+        checkTraps(dndTrapMap);
+    }
+
+    /*
+    * END OF DnD SECTION
+    */
+
+    /*
+    * Asylum Section
+    */
+    function asylumMainLoop() {
+        checkTraps(asylumTrapMap);
+        trackCollaredPatients();
+    }
+
+    /**
+     * Keeps track of collared patients in the asylum
+     * TODO check what zone in the asylum they are in
+     */
     function trackCollaredPatients() {
         for (const C of ChatRoomCharacter) {
             const collar = InventoryGet(C, "ItemNeck");
-            if (collar && collar.Asset.Name === "Nylon Collar" && collar.Craft && collar.Craft.Name === "Asylum Collar") {
+            if (collar?.Craft.Name === "Asylum Collar") {
                 const currentZone = zoneManager.getZone(C.MapData.Pos.X, C.MapData.Pos.Y);
                 collaredPlayers.set(C.MemberNumber, {
                     position: C.MapData.Pos,
@@ -160,40 +224,35 @@ async function runBCDnD() {
         }
     }
 
+
+    // NOT IMPLEMENTED YET
+
+    // CHECK PLAYER ZONES FOR ASYLUM
+    // TODO: Add punishments for leaving the designated zone
+    // TODO: Add a way to track the designated zone
+    // TODO: store player's designated zone in the collaredPlayers map
+    // TODO: Change designated zone based on collar
+    // TODO: Make sure player can still walk around in undesignated zones as long as they are permitted
     function checkPlayerZone(C) {
         const playerInfo = collaredPlayers.get(C.MemberNumber);
         if (playerInfo) {
             const currentZone = zoneManager.getZone(C.MapData.Pos.X, C.MapData.Pos.Y);
             if (currentZone && currentZone.name !== playerInfo.designatedZone) {
-                ServerSend("ChatRoomChat", { 
-                    Content: `Warning: You are in ${currentZone.name}, which is outside your designated ${playerInfo.designatedZone} zone. Please return immediately or face consequences.`, 
-                    Type: "Whisper", 
-                    Target: C.MemberNumber 
-                });
+                //ServerSend("ChatRoomChat", { 
+                   // Content: `Warning: You are in ${currentZone.name}, which is outside your designated ${playerInfo.designatedZone} zone. Please return immediately or face consequences.`, 
+                    //Type: "Whisper", 
+                    //Target: C.MemberNumber 
+                //});
+
+                console.log(`Warning: ${C.Name} is in ${currentZone.name}, which is outside their designated ${playerInfo.designatedZone} zone. Please return immediately or face consequences.`);
                 // TODO: Implement punishments here
             }
         }
     }
 
-    // Main loops
-    function dndMainLoop() {
-        checkTraps(dndTrapMap);
-    }
-
-    function asylumMainLoop() {
-        checkTraps(asylumTrapMap);
-        trackCollaredPatients();
-    }
-
-    function BCDnDMainLoop() {
-        if (currentMode === "off") return;
-
-        if (currentMode === "dnd") {
-            dndMainLoop();
-        } else if (currentMode === "asylum") {
-            asylumMainLoop();
-        }
-    }
+    /**
+    * END OF ASYLUM SECTION
+    */
 
     // Initialization
     function initializeZones() {
@@ -223,22 +282,22 @@ async function runBCDnD() {
         addTrap(asylumTrapMap, complexTrap);
     }
 
-    // Public API
-    window.BCDnD = window.BCDnD || {};
 
+    // Public API
+
+    /**
+     * Swap betweens dnd and asylum main loops
+     * @param {String} mode 
+     */
+    window.BCDnD = window.BCDnD || {};
     BCDnD.switchMode = function(mode) {
-        if (["dnd", "asylum", "off"].includes(mode)) {
+        if (mode === "dnd" || mode === "asylum" || mode === "off") {
             currentMode = mode;
             console.log(`Switched to ${mode} mode`);
         } else {
-            console.log("Invalid mode. Use 'dnd', 'asylum', or 'off'");
+            console.log("Invalid mode. Use 'dnd' or 'asylum'");
         }
-    };
-
-    BCDnD.addTrap = function(mode, trap) {
-        const trapMap = mode === "dnd" ? dndTrapMap : asylumTrapMap;
-        addTrap(trapMap, trap);
-    };
+    }
 
     BCDnD.setDesignatedZone = function(memberNumber, zoneName) {
         const playerInfo = collaredPlayers.get(memberNumber);
@@ -256,9 +315,8 @@ async function runBCDnD() {
 
     modAPI.hookFunction('TimerProcess', 2, (args, next) => { 
         BCDnDMainLoop();
-        next(args);
-    });
-    
+		next(args);
+	})
 }
 
 runBCDnD();
