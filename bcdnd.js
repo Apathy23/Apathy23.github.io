@@ -186,19 +186,13 @@ async function runBCDnD() {
     }
 
     function BCDnDMainLoop() {
-        if (!isInValidLocation() || currentMode === "off") return;
+        if (currentMode === "off") return;
 
         if (currentMode === "dnd") {
             dndMainLoop();
         } else if (currentMode === "asylum") {
             asylumMainLoop();
         }
-    }
-
-    // Utility functions
-    function isInValidLocation() {
-        const validRooms = ["AsylumEntrance", "AsylumBedroom", "AsylumTherapy", "AsylumMeeting"];
-        return validRooms.includes(Player.LastChatRoom);
     }
 
     // Initialization
