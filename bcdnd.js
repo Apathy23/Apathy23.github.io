@@ -258,16 +258,7 @@ async function runBCDnD() {
         BCDnDMainLoop();
         next(args);
     });
-
-    modAPI.hookFunction('ChatRoomSync', 0, (args, next) => {
-        const result = next(args);
-        if (isInValidLocation()) {
-            BCDnD.switchMode("asylum"); // or "dnd" depending on your preference
-        } else {
-            BCDnD.switchMode("off");
-        }
-        return result;
-    });
+    
 }
 
 runBCDnD();
