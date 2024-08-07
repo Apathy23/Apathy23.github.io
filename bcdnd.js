@@ -86,7 +86,7 @@ async function runBCDnD() {
             this.zones.set(zone.name, zone);
         }
 
-        getZone(name) {
+        getZone(x, y) {
             for (const zone of this.zones.values()) {
                 if (zone.containsPoint(x, y)) {
                     return zone;
