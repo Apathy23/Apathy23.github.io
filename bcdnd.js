@@ -146,7 +146,7 @@ async function runBCDnD() {
     function trackCollaredPatients() {
         for (const C of ChatRoomCharacter) {
             const collar = InventoryGet(C, "ItemNeck");
-            if (collar?.Craft.Name === "Asylum Collar") {
+            if (collar && collar.Asset.Name === "Nylon Collar" && collar.Craft && collar.Craft.Name === "Asylum Collar") {
                 const currentZone = zoneManager.getZone(C.MapData.Pos.X, C.MapData.Pos.Y);
                 collaredPlayers.set(C.MemberNumber, {
                     position: C.MapData.Pos,
