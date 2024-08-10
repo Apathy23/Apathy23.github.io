@@ -224,9 +224,6 @@ async function runBCDnD() {
         }
     }
 
-
-    // NOT IMPLEMENTED YET
-
     // CHECK PLAYER ZONES FOR ASYLUM
     // TODO: Add punishments for leaving the designated zone
     // TODO: Add a way to track the designated zone
@@ -281,6 +278,18 @@ async function runBCDnD() {
         addTrap(dndTrapMap, complexTrap);
         addTrap(asylumTrapMap, complexTrap);
     }
+
+    // UI
+    async function BCDnDChatRoomMenuDraw() {
+        modAPI.hookFunction('ChatRoomCharacter', 4, (args, next) => {
+            DrawButton(1815, 75, 90, 90, "", "White", "Icons/BCDnD.png", "Open BCDnD Menu");
+
+            next(args);
+        });
+    }
+
+
+
 
 
     // Public API
