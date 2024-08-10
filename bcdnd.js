@@ -283,15 +283,25 @@ async function runBCDnD() {
     async function BCDnDChatRoomMenuDraw() {
         modAPI.hookFunction('ChatRoomMenuDraw', 4, (args, next) => {
             // Left, Top, Width, Height, Label, Color, Image, HoveringText, Disabled
-            DrawButton(0, 0, 200, 50, "BCDnD", "white", null, null, false);
+            DrawButton(0, 0, 75, 50, "DnD", "white");
 
             next(args);
         });
     }
 
 
+    // Mouse click handler
+    async function BCDnDChatRoomClick() {
+        modAPI.hookFunction('ChatRoomClick', 4, (args, next) => {
+            if (currentMode === "off") return next(args);
 
+            if (MouseIn(0, 0, 75, 50)) {
+                BCDnD.switchMode("dnd");
+            }
 
+            next(args);
+        });
+    }
 
     // Public API
 
@@ -323,6 +333,7 @@ async function runBCDnD() {
     initializeZones();
     initializeTraps();
     BCDnDChatRoomMenuDraw();
+    BCDnDChatRoomClick();
 
     modAPI.hookFunction('TimerProcess', 2, (args, next) => { 
         BCDnDMainLoop();
