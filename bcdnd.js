@@ -295,7 +295,7 @@ async function runBCDnD() {
         modAPI.hookFunction('ChatRoomClick', 4, (args, next) => {
             if (currentMode === "off") return next(args);
 
-            if ((MouseX >= 0) && (MouseX <= 75) && (MouseY >= 0) && (MouseY <= 50)) {
+            if ((MouseX >= 0) && (MouseX < 75) && (MouseY >= 0) && (MouseY < 50)) {
                 BCDnD.switchMode("dnd");
             }
 
