@@ -282,7 +282,7 @@ async function runBCDnD() {
     // UI
     async function BCDnDChatRoomMenuDraw() {
         modAPI.hookFunction('ChatRoomMenuDraw', 4, (args, next) => {
-            DrawButton(1815, 75, 90, 90, "", "White", "Icons/BCDnD.png", "Open BCDnD Menu");
+            DrawButton(1815, 75, 90, 90, "", "White", null, "Open BCDnD Menu");
 
             next(args);
         });
