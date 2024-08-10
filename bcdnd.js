@@ -321,6 +321,7 @@ async function runBCDnD() {
     // Initialization and hooks
     initializeZones();
     initializeTraps();
+    BCDnDChatRoomMenuDraw();
 
     modAPI.hookFunction('TimerProcess', 2, (args, next) => { 
         BCDnDMainLoop();
